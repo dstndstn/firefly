@@ -36,8 +36,10 @@ CAPTOUCH := CapacitiveSensor.o
 
 ARDOBJS := wiring.o wiring_digital.o hooks.o
 
+MAP := firefly.map
+
 firefly.elf: firefly.o $(NEOPIXEL) $(CAPTOUCH) $(ARDOBJS)
-	$(CC) $(CFLAGS) -Wl,-Map,keyboard.map -o $@ $^
+	$(CC) $(CFLAGS) -Wl,-Map,$(MAP) -o $@ $^
 
 program:
 	avrdude -p m168 -c bsd -U flash:w:$(HEX)

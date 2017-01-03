@@ -25,7 +25,8 @@ CapacitiveSensor cs1 = CapacitiveSensor(3, 4);
 
 #define PIXEL_PIN    6    // Digital IO pin connected to the NeoPixels.
 
-#define PIXEL_COUNT 3
+//#define PIXEL_COUNT 3
+#define PIXEL_COUNT 1
 
 // Parameter 1 = number of pixels in strip,  neopixel stick has 8
 // Parameter 2 = pin number (most are valid)
@@ -50,8 +51,19 @@ uint32_t Wheel(byte WheelPos);
 void setup();
 void loop();
 
+// From https://github.com/arduino/Arduino/blob/2bfe164b9a5835e8cb6e194b928538a9093be333/hardware/arduino/avr/cores/arduino/main.cpp
+// Weak empty variant initialization function.
+// May be redefined by variant files.
+void initVariant() __attribute__((weak));
+void initVariant() { }
+
+
 int main() {
-    setup();
+
+	init();
+	initVariant();
+
+	setup();
     for (;;)
         loop();
 }
@@ -84,7 +96,8 @@ void loop() {
 
     long start = millis();
     
-  // if capacitive touch button pressed, advance, set mark
+	/*
+	// if capacitive touch button pressed, advance, set mark
   int touchVal = cs1.capacitiveSensor(30);
   //if (chkTouch(cs1.capacitiveSensor(30))) {
   if (chkTouch(touchVal)) {
@@ -93,6 +106,7 @@ void loop() {
         showType=1;
       startShow(showType);
   }
+	 */
 
   //Serial.print(millis() - start);
 //Serial.print("\t");                    // tab character for debug window spacing
