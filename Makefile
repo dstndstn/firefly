@@ -33,15 +33,16 @@ OBJDUMP        = avr-objdump
 ARD_DIR := /Applications/Arduino.app/Contents/Java/hardware/arduino/avr/
 
 CFLAGS := -O2 -DF_CPU=$(F_CPU) -Iv-usb/usbdrv -I. -mmcu=$(MCU_TARGET) \
-	-DARDUINO=100 -H \
+	-DARDUINO=100 \
 	-I$(ARD_DIR)/cores/arduino \
-	-I$(ARD_DIR)/variants/standard
+	-I$(ARD_DIR)/variants/standard \
+	-DSTANDALONE=1
 
 NEOPIXEL := Adafruit_NeoPixel.o
 
 CAPTOUCH := CapacitiveSensor.o
 
-ARDOBJS := wiring.o wiring_digital.o hooks.o
+ARDOBJS := wiring.o wiring_digital.o hooks.o WMath.o
 
 MAP := firefly.map
 
