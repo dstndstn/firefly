@@ -4,7 +4,7 @@
 
 #define TOUCH_DELAY 500
 //#define TOUCH_THRESH 300
-#define TOUCH_THRESH 50
+#define TOUCH_THRESH 100
 
 // Touch Sensing
 unsigned long mark;
@@ -53,6 +53,7 @@ int main() {
 }
 #endif
 
+//#define SERIAL 1
 
 void setup() {
 
@@ -61,6 +62,7 @@ void setup() {
 #endif
 
   cs1.set_CS_Timeout_Millis(500);
+  //cs1.set_CS_Timeout_Millis(2000);
   cs1.reset_CS_AutoCal();
   cs1.set_CS_AutocaL_Millis(0xFFFFFFFF);
     
@@ -86,6 +88,18 @@ class LedShow {
     virtual void step() {}
  protected:
     uint16_t n;
+};
+
+class Black : public LedShow {
+  public:
+    Black(uint16_t n_leds) : LedShow(n_leds) {}
+    virtual void step() {
+        uint16_t i;
+        for(i=0; i<this->n; i++) {
+            strip.setPixelColor(i, 0);
+        }
+        strip.show();
+    }
 };
 
 class RainbowCycle : public LedShow {
@@ -217,14 +231,33 @@ bool oldState = HIGH;
 
 RainbowCycle rainbow(PIXEL_COUNT);
 Blinker blinker(PIXEL_COUNT);
+Black dark(PIXEL_COUNT);
 LedShow* ledshow = &blinker;
 
+int show = 0;
+int count = 0;
+// timeout counter
+int seconds = 0;
+#define TIMEOUT 3600
+
 void loop() {
+  bool pressed = false;
 
-    ledshow->step();
-    delay(20);
+  ledshow->step();
+  delay(20);
 
-  return;
+  count++;
+
+  // only check for a touch every 10th time through the loop...
+  if (count % 10)
+    return;
+
+  // count roughly the number of seconds since last button press
+  if (count >0 && (count % 50 == 0)) {
+      // we don't keep incrementing after a timeout to avoid overflow.
+      if (seconds <= TIMEOUT)
+        seconds++;
+  }
 
 #if SERIAL
   long start = millis();
@@ -233,7 +266,7 @@ void loop() {
   // if capacitive touch button pressed, advance, set mark
   int touchVal = cs1.capacitiveSensor(30);
   if (chkTouch(touchVal)) {
-    // PRESSED
+    pressed = true;
   }  
 
 #if SERIAL
@@ -251,12 +284,31 @@ void loop() {
     // Check if button is still low after debounce.
     newState = digitalRead(BUTTON_PIN);
     if (newState == LOW) {
-        // PRESSED
+      pressed = true;
     }
   }
   // Set the last button state to the old state.
   oldState = newState;
-}
 
+  if (pressed) {
+    show++;
+    if (show % 3 == 0)
+      ledshow = &blinker;
+    else if (show % 3 == 1)
+      ledshow = &rainbow;
+    else
+      ledshow = &dark;
+
+    seconds = 0;
+  }
+
+  if (seconds > TIMEOUT) {
+      // shut off if no activity after an hour
+      ledshow = &dark;
+      // go to initial pattern when button pressed again
+      show = 2;
+  }
+  
+}
 
 
