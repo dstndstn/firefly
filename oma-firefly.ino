@@ -19,7 +19,7 @@ CapacitiveSensor cs1 = CapacitiveSensor(3, 4);
 
 #define PIXEL_PIN    6    // Digital IO pin connected to the NeoPixels.
 
-#define PIXEL_COUNT 3
+#define PIXEL_COUNT 6
 
 // Parameter 1 = number of pixels in strip,  neopixel stick has 8
 // Parameter 2 = pin number (most are valid)
